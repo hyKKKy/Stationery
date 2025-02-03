@@ -81,6 +81,16 @@ namespace Stationery
                 }
             }
         }
+        public static void showMaxAmount()
+        {
+            using (ApplicationContext db = new())
+            {
+                int? maxAmount = db.Items.Max(s => (int?)s.amount);
+
+                var item = db.Items.FirstOrDefault(s => s.amount == maxAmount);
+                Console.WriteLine($"Minimum amouts has {item.Name} item");
+            }
+        }
 
         public static void showMinAmount()
         {
@@ -89,8 +99,29 @@ namespace Stationery
                 int? minAmount = db.Items.Min(s => (int?)s.amount);
 
                 var item = db.Items.FirstOrDefault(s => s.amount == minAmount);
-                Console.WriteLine($"Minimum amouts has {item.Name} item");
+                Console.WriteLine($"Maximum amouts has {item.Name} item");
             }
         }
+        public static void showMinSelfPrice() 
+        {
+            using (ApplicationContext db = new()) 
+            {
+                int? minSelfPrice = db.Items.Min(s => (int?)s.selfprice);
+
+                var item = db.Items.FirstOrDefault(s => s.selfprice == minSelfPrice);
+                Console.WriteLine($"Item with minimum selfprice: ");
+            }
+        }
+        public static void showMaxSelfPrice()
+        {
+            using (ApplicationContext db = new())
+            {
+                int? maxSelfPrice = db.Items.Max(s => (int?)s.selfprice);
+
+                var item = db.Items.FirstOrDefault(s => s.selfprice == maxSelfPrice);
+                Console.WriteLine($"Item with minimum selfprice: ");
+            }
+        }
+
     }
 }
