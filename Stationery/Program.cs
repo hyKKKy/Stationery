@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 namespace Stationery
 {
@@ -17,9 +18,10 @@ namespace Stationery
                 db.Types.AddRange(WritingInstruments, paperProducts, officeTools);
 
                 Item pen = new Item { Name = "Pen", Type = WritingInstruments, amount = 500, selfprice = 130 };
-                Item notebook = new Item { Name = "Notebook", Type = paperProducts, amount = 600, selfprice = 200};
-                Item stapler = new Item { Name = "Stapler", Type = officeTools, amount = 700, selfprice = 100};
-                db.Items.AddRange(pen, notebook, stapler);
+                Item notebook = new Item { Name = "Notebook", Type = paperProducts, amount = 600, selfprice = 200 };
+                Item stapler = new Item { Name = "Stapler", Type = officeTools, amount = 700, selfprice = 100 };
+                Item ruler = new Item { Name = "Ruler", Type = officeTools, amount = 700, selfprice = 100 };
+                db.Items.AddRange(pen, notebook, stapler, ruler);
 
                 Manager John = new Manager { Name = "John", Surname = "Smith" };
                 Manager Brad = new Manager { Name = "Brad", Surname = "Pitt" };
@@ -31,7 +33,7 @@ namespace Stationery
                 Buyer Alex = new Buyer { Name = "Alex" };
                 db.Buyers.AddRange(Kurt, Jason, Alex);
 
-                Selling s1 = new Selling { price = 200, amount = 30, date = new DateOnly(2025, 1, 13), Item = pen, Manager = John, Buyer = Kurt};
+                Selling s1 = new Selling { price = 200, amount = 30, date = new DateOnly(2025, 1, 13), Item = pen, Manager = John, Buyer = Kurt };
                 Selling s2 = new Selling { price = 300, amount = 23, date = new DateOnly(2025, 1, 20), Item = notebook, Manager = Brad, Buyer = Jason };
                 Selling s3 = new Selling { price = 150, amount = 56, date = new DateOnly(2025, 2, 2), Item = stapler, Manager = Nick, Buyer = Alex };
                 db.Sellings.AddRange(s1, s2, s3);
@@ -40,7 +42,12 @@ namespace Stationery
                 //showInfo();
                 //showTypes();
                 //showMangers();
-                showMinAmount();
+                //showMinAmount();
+                //showItemBycategory();
+                //showItemByManager();
+                //showItemByBuyer();
+                //showNewestSell();
+                averageAmount();
             }
         }
 
@@ -52,7 +59,7 @@ namespace Stationery
                 Console.WriteLine("All items:");
                 foreach (Item i in items)
                 {
-                    Console.WriteLine('\t'+i.Name);
+                    Console.WriteLine('\t' + i.Name);
                 }
             }
         }
@@ -64,7 +71,7 @@ namespace Stationery
                 Console.WriteLine("All types:");
                 foreach (Type t in types)
                 {
-                    Console.WriteLine('\t'+t.Name);
+                    Console.WriteLine('\t' + t.Name);
                 }
             }
         }
@@ -102,9 +109,9 @@ namespace Stationery
                 Console.WriteLine($"Maximum amouts has {item.Name} item");
             }
         }
-        public static void showMinSelfPrice() 
+        public static void showMinSelfPrice()
         {
-            using (ApplicationContext db = new()) 
+            using (ApplicationContext db = new())
             {
                 int? minSelfPrice = db.Items.Min(s => (int?)s.selfprice);
 
@@ -120,6 +127,79 @@ namespace Stationery
 
                 var item = db.Items.FirstOrDefault(s => s.selfprice == maxSelfPrice);
                 Console.WriteLine($"Item with minimum selfprice: ");
+            }
+        }
+        public static void showItemBycategory()
+        {
+            using (ApplicationContext db = new())
+            {
+                string userInput;
+                Console.WriteLine("Write a category: ");
+                userInput = Console.ReadLine();
+
+                var items = db.Items.Where(i => i.Type.Name == userInput).ToList();
+                foreach (var item in items)
+                {
+                    Console.WriteLine(item.Name);
+                }
+            }
+        }
+        public static void showItemByManager()
+        {
+            using (ApplicationContext db = new())
+            {
+                string userInput;
+                Console.WriteLine("Input manager's name: ");
+                userInput = Console.ReadLine();
+
+                var items = db.Sellings.Include(s => s.Item).Include(s => s.Manager).Where(s => s.Manager.Name == userInput).ToList();
+                Console.WriteLine($"Manager {userInput} sold: ");
+                foreach (var item in items)
+                {
+                    Console.WriteLine('\t'+item.Item.Name);
+                }
+            }
+        }
+
+        public static void showItemByBuyer()
+        {
+            using (ApplicationContext db = new())
+            {
+                string userInput;
+                Console.WriteLine("Input buyer's name: ");
+                userInput = Console.ReadLine();
+
+                var items = db.Sellings.Include(s => s.Item).Include(s => s.Buyer).Where(s => s.Buyer.Name == userInput).ToList();
+                Console.WriteLine($"Buyer {userInput} bought: ");
+                foreach (var item in items)
+                {
+                    Console.WriteLine('\t' + item.Item.Name);
+                }
+            }
+        }
+        public static void showNewestSell()
+        {
+            using (ApplicationContext db = new())
+            {
+                DateOnly? maxDate = db.Sellings.Max(s => (DateOnly?)s.date);
+                var item = db.Sellings.Include(s => s.Item).FirstOrDefault(s => s.date == maxDate);
+
+                Console.WriteLine(item.Item.Name);
+            }
+        }
+
+        public static void averageAmount()
+        {
+            using (ApplicationContext db = new())
+            {
+                var averages = db.Items.Include(s => s.Type)
+                    .GroupBy(i => i.Type.Name)
+                    .Select(g => new { TypeName = g.Key, averageAmount = g.Average(i => i.amount) })
+                    .ToList();
+                foreach (var item in averages)
+                {
+                    Console.WriteLine(item.TypeName + " - " + item.averageAmount);
+                }
             }
         }
 
