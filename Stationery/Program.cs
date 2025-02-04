@@ -39,6 +39,76 @@ namespace Stationery
                 db.Sellings.AddRange(s1, s2, s3);
                 db.SaveChanges();
 
+                int user_choice;
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine("Welcome to the stationery!\n" +
+                            "1.Enter 1 to show all info;\n" +
+                            "2.Enter 2 to show all types;\n" +
+                            "3.Enter 3 to show all managers;\n" +
+                            "4.Enter 4 to show max amount of items;\n" +
+                            "5.Enter 5 to show min amount of items;\n" +
+                            "6.Enter 6 to show min selfcost;\n" +
+                            "7.Enter 7 to show max selftcost;\n" +
+                            "8.Enter 8 to show item by type;\n" +
+                            "9.Enter 9 to show sold items by manager;\n" +
+                            "10.Enter 10 to show items bought by buyer;\n" +
+                            "11.Enter 11 to show the newest sell;\n" +
+                            "12.Enter 12 to show average amount of items;\n"+
+                            "0 - to exit");
+                    int.TryParse(Console.ReadLine(), out user_choice);
+                    switch (user_choice)
+                    {
+                        case 1:
+                            showInfo();
+                            break;
+                        case 2:
+                            showTypes();
+                            break;
+                        case 3:
+                            showMangers();
+                            break;
+                        case 4:
+                            showMaxAmount();
+                            break;
+                        case 5:
+                            showMinAmount();
+                            break;
+                        case 6:
+                            showMinSelfPrice();
+                            break;
+                        case 7:
+                            showMaxSelfPrice();
+                            break;
+                        case 8:
+                            showItemBycategory();
+                            break;
+                        case 9:
+                            showItemByManager();
+                            break;
+                        case 10:
+                            showItemByBuyer();
+                            break;
+                        case 11:
+                            showNewestSell();
+                            break;
+                        case 12:
+                            averageAmount();
+                            break;
+                        case 0:
+                            Console.WriteLine("Good bye!");
+                            break;
+                        default:
+                            Console.WriteLine("Wrong input!");
+                            break;
+                    }
+                    if (user_choice != 0)
+                    {
+                        Console.WriteLine("\nPress any key to return to the menu...");
+                        Console.ReadKey();
+                    }
+                } while (user_choice != 0);
                 //showInfo();
                 //showTypes();
                 //showMangers();
@@ -47,7 +117,7 @@ namespace Stationery
                 //showItemByManager();
                 //showItemByBuyer();
                 //showNewestSell();
-                averageAmount();
+                //averageAmount();
             }
         }
 
